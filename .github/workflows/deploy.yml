@@ -1,0 +1,34 @@
+name: Deploy FHIR IG to GitHub Pages
+
+# Trigger the workflow on every push to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      # Step 2: Build the FHIR IG using Sushi (or your preferred method)
+      - name: Build FHIR IG with Sushi
+        run: |
+          npm install -g fsh-sushi  # Install Sushi
+          sushi .                   # Run Sushi to build the IG
+
+      # Step 3: Rename output directory to docs
+      - name: Rename output to docs
+        run: mv output docs
+
+      # Step 4: Deploy the docs folder to the gh-pages branch
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs  # The directory to publish
+          publish_branch: gh-pages
